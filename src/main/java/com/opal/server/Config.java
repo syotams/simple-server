@@ -43,4 +43,8 @@ public class Config {
             properties.setProperty(key, value);
         }
     }
+
+    public int getInt(String key) {
+        return Integer.valueOf(this.get(key));
+    }
 }

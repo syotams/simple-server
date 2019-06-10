@@ -1,10 +1,9 @@
 package com.opal.server.strategy.architecture;
 
-import com.opal.server.protocol.TCPProtocol;
+import com.opal.server.ConnectionHandlerInterface;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.net.Socket;
 import java.util.concurrent.Executor;
 
 public class ThreadPoolStrategy implements ThreadStrategyInterface {
@@ -16,11 +15,10 @@ public class ThreadPoolStrategy implements ThreadStrategyInterface {
         this.executor = executor;
     }
 
-    public void process(BufferedReader in, OutputStream out) {
+    public void process(Socket clientSocket, ConnectionHandlerInterface connectionHandler) {
         executor.execute(() -> {
-            TCPProtocol httpProtocol = new TCPProtocol();
             try {
-                httpProtocol.process(in, out);
+                connectionHandler.onConnection(clientSocket);
             } catch (IOException e) {
                 e.printStackTrace();
             }

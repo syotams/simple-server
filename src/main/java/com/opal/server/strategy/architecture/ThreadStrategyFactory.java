@@ -1,14 +1,14 @@
 package com.opal.server.strategy.architecture;
 
 import com.opal.server.Config;
-import com.opal.server.protocol.TCPProtocol;
 
 import java.util.concurrent.Executors;
 
 public class ThreadStrategyFactory {
 
-    private final static int THREAD_PER_REQUEST = 1;
-    private final static int THREAD_POOL = 2;
+    public final static int SINGLE_THREAD = 0;
+    public final static int THREAD_PER_REQUEST = 1;
+    public final static int THREAD_POOL = 2;
 
     public static ThreadStrategyInterface create(int strategy, Config config) {
 
@@ -17,10 +17,12 @@ public class ThreadStrategyFactory {
                 return new ThreadPerRequestStrategy();
 
             case THREAD_POOL:
-                return new ThreadPoolStrategy(Executors.newFixedThreadPool(Integer.valueOf(config.get("poolSize"))));
+                return new ThreadPoolStrategy(
+                    Executors.newFixedThreadPool(config.getInt("poolSize"))
+                );
 
             default:
-                return new SingleThreadStrategy(new TCPProtocol());
+                return new SingleThreadStrategy();
         }
     }
 

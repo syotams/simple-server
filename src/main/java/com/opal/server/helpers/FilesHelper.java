@@ -12,7 +12,7 @@ public class FilesHelper {
         InputStream inputStream = classLoader.getResourceAsStream(fileName);
 
         if (inputStream == null) {
-            throw new IllegalArgumentException("file is not found!");
+            throw new IllegalArgumentException("file not found!");
         } else {
             return inputStream;
         }

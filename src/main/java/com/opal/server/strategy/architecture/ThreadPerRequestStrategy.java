@@ -1,19 +1,17 @@
 package com.opal.server.strategy.architecture;
 
-import com.opal.server.protocol.TCPProtocol;
+import com.opal.server.ConnectionHandlerInterface;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.net.Socket;
 
 public class ThreadPerRequestStrategy implements ThreadStrategyInterface {
 
     @Override
-    public void process(BufferedReader in, OutputStream out) {
+    public void process(Socket clientSocket, ConnectionHandlerInterface connectionHandler) {
         Thread thread = new Thread(() -> {
-            TCPProtocol httpProtocol = new TCPProtocol();
             try {
-                httpProtocol.process(in, out);
+                connectionHandler.onConnection(clientSocket);
             } catch (IOException e) {
                 e.printStackTrace();
             }

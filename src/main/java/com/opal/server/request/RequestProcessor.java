@@ -1,47 +1,35 @@
 package com.opal.server.request;
 
-import com.opal.server.FileStreamer;
 import com.opal.server.response.Response;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.util.ArrayList;
 
-public class RequestProcessor {
+public class RequestProcessor implements RequestProcessorInterface {
 
-    private final String inputString;
+    private ArrayList<RequestProcessorInterface> processors;
 
+    private RequestProcessor() {}
 
-    public RequestProcessor(String input) {
-        this.inputString = input;
+    public static RequestProcessor make() {
+        RequestProcessor processor = new RequestProcessor();
+        processor.processors = new ArrayList<>();
+
+        processor.addRequestProcessor(new StaticFileProcessor());
+
+        return processor;
     }
 
-    public void process(OutputStream out) {
-        Request request = Request.build(inputString);
-        Response response = Response.build(out);
-
-        String resource = request.getResource();
-
-        if(resource.equals("")) {
-            resource =  "index.html";
-        }
-
-        download(resource, response);
+    public void addRequestProcessor(RequestProcessorInterface processor) {
+        processors.add(processor);
     }
 
-    private void download(String resource, Response response) {
-        FileStreamer fileStreamer = new FileStreamer();
+    @Override
+    public boolean process(Request request, Response response) {
+        for (RequestProcessorInterface processor : processors) {
+            // TODO: should handle exception and eliminate predicate
+            if(processor.process(request, response)) return true;
+        }
 
-        try {
-            System.out.println(String.format("Processing request %s", resource));
-            fileStreamer.streamFile(resource, response);
-            System.out.println(String.format("Processed request %s successfully", resource));
-        }
-        catch (FileNotFoundException e) {
-            response.notFound();
-        }
-        catch (IOException e) {
-            response.serverError();
-        }
+        return false;
     }
 }

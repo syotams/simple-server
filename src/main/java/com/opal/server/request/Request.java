@@ -1,5 +1,7 @@
 package com.opal.server.request;
 
+import com.opal.server.protocol.Protocol;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -7,69 +9,28 @@ import java.util.regex.Pattern;
 
 public class Request {
 
-    private final String rawHeader;
-
     private Map<String, String> headers = new HashMap<>();
 
-    private String method;
-
-    private String resource;
-
-    private String protocolVersion;
+    private Protocol protocol;
 
 
-    public Request() throws Exception {
-        throw new Exception("Cannot create object use build method");
+    public Map<String, String> getHeaders() {
+        return headers;
     }
 
-    private Request(String header) {
-        this.rawHeader = header;
+    public void setHeaders(Map<String, String> headers) {
+        this.headers = headers;
     }
 
-    public static Request build(String header) {
-        Request request = new Request(header);
-
-        request.parseResource();
-        request.parseHeaders();
-
-        return request;
+    public void setProtocol(Protocol protocol) {
+        this.protocol = protocol;
     }
 
-    private void parseResource() {
-        Matcher matcher = Pattern.compile("^(.*?) \\/(.*?) HTTP\\/(.*)").matcher(rawHeader);
-
-        if(matcher.find()) {
-            method = matcher.group(1);
-            resource = matcher.group(2).trim();
-            protocolVersion = matcher.group(3);
-        }
-    }
-
-    private void parseHeaders() {
-        String[] headersLine = rawHeader.split(System.lineSeparator());
-
-        for (String line : headersLine) {
-            parseLine(line);
-        }
-    }
-
-    private void parseLine(String line) {
-        String[] keyMap = line.split(":");
-
-        if(keyMap.length==2) {
-            headers.put(keyMap[0].trim(), keyMap[1].trim());
-        }
-    }
-
-    public String getMethod() {
-        return method;
+    public Protocol getProtocol() {
+        return protocol;
     }
 
     public String getResource() {
-        return resource;
-    }
-
-    public String getProtocolVersion() {
-        return protocolVersion;
+        return protocol.getResource();
     }
 }

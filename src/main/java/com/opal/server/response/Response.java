@@ -9,6 +9,9 @@ public class Response {
 
     private StringBuilder header = new StringBuilder();
 
+    private StringBuilder content = new StringBuilder();
+
+    private boolean isHeaderSent;
 
     public Response() throws Exception {
         throw new Exception("Cannot create object use build method");
@@ -30,9 +33,23 @@ public class Response {
         header.append(text);
     }
 
-    public void flush() throws IOException {
+    public void sendHeaders() throws IOException {
+        if(isHeaderSent) {
+            throw new RuntimeException("Headers already sent");
+        }
+
         out.write(header.toString().getBytes());
         out.flush();
+        header.setLength(0);
+        isHeaderSent = true;
+    }
+
+    public void send() throws IOException {
+        if(!isHeaderSent) {
+            sendHeaders();
+        }
+
+        out.write(content.toString().getBytes());
     }
 
     public void notFound() {
@@ -44,5 +61,9 @@ public class Response {
     public void serverError() {
         this.header.setLength(0);
         this.addHeader("HTTP/1.1 500 Server Error\n\n");
+    }
+
+    public void addContent(String data) {
+        content.append(data);
     }
 }

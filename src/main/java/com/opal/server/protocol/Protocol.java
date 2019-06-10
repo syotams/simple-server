@@ -1,11 +1,15 @@
 package com.opal.server.protocol;
 
+import com.opal.server.request.Request;
+
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.OutputStream;
 
 public interface Protocol {
 
-    void process(BufferedReader reader, OutputStream out) throws IOException;
+    Request process(BufferedReader bufferedReader) throws IOException;
 
+    void reset();
+
+    String getResource();
 }

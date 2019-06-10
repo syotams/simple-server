@@ -1,11 +1,12 @@
 package com.opal.server.strategy.architecture;
 
-import java.io.BufferedReader;
+import com.opal.server.ConnectionHandlerInterface;
+
 import java.io.IOException;
-import java.io.OutputStream;
+import java.net.Socket;
 
 public interface ThreadStrategyInterface {
 
-    void process(BufferedReader reader, OutputStream out) throws IOException;
+    void process(Socket socket, ConnectionHandlerInterface connectionHandler) throws IOException;
 
 }
