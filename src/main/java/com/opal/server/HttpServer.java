@@ -1,51 +1,18 @@
 package com.opal.server;
 
-
-import com.opal.server.helpers.FilesHelper;
 import com.opal.server.protocol.HttpProtocol;
-
-import java.io.File;
+import com.opal.server.request.RequestProcessor;
+import com.opal.server.strategy.architecture.ThreadStrategyInterface;
 
 public class HttpServer {
 
-    public static void main(String[] args) {
-        Config config = Config.getInstance();
+    public static Server create(int port, ThreadStrategyInterface threadStrategy) {
+        ConnectionHandler connectionHandler = new ConnectionHandler(new HttpProtocol(), new RequestProcessor());
 
-        init(args, config);
+        Server server = Server.create(connectionHandler, threadStrategy);
+        server.listen(port);
 
-        Server server = Server.create(new ConnectionHandler(new HttpProtocol()), null);
-        server.listen(config.getInt("port"));
-
-        server.start();
+        return server;
     }
 
-    private static void init(String[] args, Config config) {
-        for(int i=0; i<args.length; i+=2) {
-            String value;
-
-            if(args.length > i+1) {
-                value = args[i+1];
-            }
-            else {
-                throw new IllegalArgumentException(args[i] + " is defined but does not have a value");
-            }
-
-            if(args[i].equalsIgnoreCase("-p") || args[i].equalsIgnoreCase("--port")) {
-                config.set("port", value);
-            }
-            else if(args[i].equalsIgnoreCase("-s") || args[i].equalsIgnoreCase("--strategy")) {
-                config.set("strategy", value);
-            }
-            else if(args[i].equalsIgnoreCase("-pl") || args[i].equalsIgnoreCase("--pool")) {
-                config.set("poolSize", value);
-            }
-            else if(args[i].equalsIgnoreCase("--root")) {
-                if(new File(value).isDirectory()) {
-                    config.set("root", value);
-                }
-            }
-        }
-
-        FilesHelper.createFolderIfNotExists(System.getProperty("user.dir"), config.get("root"));
-    }
 }

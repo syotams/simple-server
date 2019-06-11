@@ -2,6 +2,7 @@ package com.opal.server;
 
 import com.opal.server.protocol.Protocol;
 import com.opal.server.request.RequestProcessor;
+import com.opal.server.request.RequestProcessorInterface;
 import com.opal.server.response.Response;
 
 import java.io.BufferedReader;
@@ -14,8 +15,12 @@ public class ConnectionHandler implements ConnectionHandlerInterface {
 
     private final Protocol protocol;
 
-    public ConnectionHandler(Protocol protocol) {
+    private RequestProcessor requestProcessor;
+
+
+    public ConnectionHandler(Protocol protocol, RequestProcessor requestProcessor) {
         this.protocol = protocol;
+        this.requestProcessor = requestProcessor;
     }
 
     public void onConnection(Socket socket) {
@@ -24,7 +29,6 @@ public class ConnectionHandler implements ConnectionHandlerInterface {
             OutputStream out     = socket.getOutputStream()
         ) {
             Response response = Response.build(out);
-            RequestProcessor requestProcessor = RequestProcessor.make();
             requestProcessor.process(protocol.process(in), response);
 
             response.send();
@@ -34,5 +38,10 @@ public class ConnectionHandler implements ConnectionHandlerInterface {
             // we set catch here if socket is closed by client, so server won't be closed
             System.out.println("Connection closed by client");
         }
+    }
+
+    @Override
+    public void addRequestProcessor(RequestProcessorInterface requestProcessor) {
+        this.requestProcessor.addRequestProcessor(requestProcessor);
     }
 }

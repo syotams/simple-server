@@ -6,18 +6,8 @@ import java.util.ArrayList;
 
 public class RequestProcessor implements RequestProcessorInterface {
 
-    private ArrayList<RequestProcessorInterface> processors;
+    private ArrayList<RequestProcessorInterface> processors = new ArrayList<>();
 
-    private RequestProcessor() {}
-
-    public static RequestProcessor make() {
-        RequestProcessor processor = new RequestProcessor();
-        processor.processors = new ArrayList<>();
-
-        processor.addRequestProcessor(new StaticFileProcessor());
-
-        return processor;
-    }
 
     public void addRequestProcessor(RequestProcessorInterface processor) {
         processors.add(processor);

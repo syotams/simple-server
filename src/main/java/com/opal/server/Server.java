@@ -1,5 +1,6 @@
 package com.opal.server;
 
+import com.opal.server.request.RequestProcessorInterface;
 import com.opal.server.strategy.architecture.ThreadStrategyFactory;
 import com.opal.server.strategy.architecture.ThreadStrategyInterface;
 
@@ -26,18 +27,9 @@ public class Server {
         this.connectionHandler = connectionHandler;
     }
 
-    public static Server create(ConnectionHandlerInterface connectionHandler,
-                                ThreadStrategyInterface threadStrategy) {
+    public static Server create(ConnectionHandlerInterface connectionHandler, ThreadStrategyInterface threadStrategy) {
         Server server = new Server(connectionHandler);
-
-        if(null==threadStrategy) {
-            server.threadStrategy =
-                    ThreadStrategyFactory.create(ThreadStrategyFactory.SINGLE_THREAD, Config.getInstance());
-        }
-        else {
-            server.threadStrategy = threadStrategy;
-        }
-
+        server.threadStrategy = threadStrategy;
         return server;
     }
 
@@ -75,6 +67,10 @@ public class Server {
 
     public void listen(int portNumber) {
         setPortNumber(portNumber);
+    }
+
+    public void addHandler(RequestProcessorInterface requestProcessor) {
+        this.connectionHandler.addRequestProcessor(requestProcessor);
     }
 
     private void setPortNumber(int portNumber) {
