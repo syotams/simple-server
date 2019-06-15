@@ -9,7 +9,4 @@ public interface Protocol {
 
     Request process(BufferedReader bufferedReader) throws IOException;
 
-    void reset();
-
-    String getResource();
 }

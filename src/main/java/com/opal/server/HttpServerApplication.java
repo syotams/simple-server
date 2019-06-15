@@ -2,9 +2,8 @@ package com.opal.server;
 
 
 import com.opal.server.helpers.FilesHelper;
-import com.opal.server.request.StaticFileProcessor;
+import com.opal.server.request.StaticFileHandler;
 import com.opal.server.strategy.architecture.ThreadStrategyFactory;
-import com.opal.server.strategy.architecture.ThreadStrategyInterface;
 
 import java.io.File;
 
@@ -15,11 +14,8 @@ public class HttpServerApplication {
 
         init(args, config);
 
-        ThreadStrategyInterface threadStrategy =
-                ThreadStrategyFactory.create(ThreadStrategyFactory.SINGLE_THREAD, Config.getInstance());
-
-        Server server = HttpServer.create(config.getInt("port"), threadStrategy);
-        server.addHandler(new StaticFileProcessor());
+        Server server = HttpServer.create(config.getInt("port"), ThreadStrategyFactory.SINGLE_THREAD);
+        server.addHandler(new StaticFileHandler());
         server.start();
     }
 

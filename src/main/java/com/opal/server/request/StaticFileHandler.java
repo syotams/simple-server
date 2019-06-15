@@ -6,12 +6,12 @@ import com.opal.server.response.Response;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class StaticFileProcessor implements RequestProcessorInterface {
+public class StaticFileHandler implements RequestHandlerInterface {
 
-    public boolean process(Request request, Response response) {
+    public boolean handle(Request request, Response response) {
         String resource = request.getResource();
 
-        if(resource.equals("")) {
+        if(null==resource || resource.equals("")) {
             resource =  "index.html";
         }
 

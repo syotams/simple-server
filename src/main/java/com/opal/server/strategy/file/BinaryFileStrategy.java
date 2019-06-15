@@ -24,8 +24,6 @@ public class BinaryFileStrategy implements FileStrategy {
 
         InputStream inputStream = new FileInputStream(file);
 
-        //int offset = 0;
-
         int totalRead;
         int bufferSize = fileSize > 4096 ? 4096 : (int)fileSize;
         byte[] buffer = new byte[bufferSize];

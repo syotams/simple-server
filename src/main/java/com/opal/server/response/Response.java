@@ -50,6 +50,7 @@ public class Response {
         }
 
         out.write(content.toString().getBytes());
+        out.close();
     }
 
     public void notFound() {

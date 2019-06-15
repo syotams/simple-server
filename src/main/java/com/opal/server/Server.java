@@ -1,7 +1,6 @@
 package com.opal.server;
 
-import com.opal.server.request.RequestProcessorInterface;
-import com.opal.server.strategy.architecture.ThreadStrategyFactory;
+import com.opal.server.request.RequestHandlerInterface;
 import com.opal.server.strategy.architecture.ThreadStrategyInterface;
 
 import java.io.IOException;
@@ -14,9 +13,6 @@ public class Server {
     private static int DEFAULT_PORT = 4000;
 
     private int portNumber = DEFAULT_PORT;
-
-    // currently no supported
-    private ServerListenerInterface listener;
 
     private ConnectionHandlerInterface connectionHandler;
 
@@ -31,10 +27,6 @@ public class Server {
         Server server = new Server(connectionHandler);
         server.threadStrategy = threadStrategy;
         return server;
-    }
-
-    public void onConnection(ServerListenerInterface listener) {
-        this.listener = listener;
     }
 
     public void start() {
@@ -66,16 +58,12 @@ public class Server {
     }
 
     public void listen(int portNumber) {
-        setPortNumber(portNumber);
-    }
-
-    public void addHandler(RequestProcessorInterface requestProcessor) {
-        this.connectionHandler.addRequestProcessor(requestProcessor);
-    }
-
-    private void setPortNumber(int portNumber) {
-        if(portNumber > 1024) {
+        if(portNumber > 1024 || portNumber==80) {
             this.portNumber = portNumber;
         }
+    }
+
+    public void addHandler(RequestHandlerInterface requestProcessor) {
+        this.connectionHandler.addRequestHandler(requestProcessor);
     }
 }

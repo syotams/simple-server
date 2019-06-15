@@ -19,7 +19,7 @@ public class Request {
     }
 
     public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
+        if(null!=headers) { this.headers = headers; }
     }
 
     public void setProtocol(Protocol protocol) {
@@ -31,6 +31,10 @@ public class Request {
     }
 
     public String getResource() {
-        return protocol.getResource();
+        return headers.get("RESOURCE");
+    }
+
+    public String getMethod() {
+        return headers.get("METHOD");
     }
 }

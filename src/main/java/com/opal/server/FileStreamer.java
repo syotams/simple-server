@@ -25,7 +25,7 @@ public class FileStreamer {
         String extension = fullPath.substring(fullPath.lastIndexOf("."));
 
         res.addHeader("HTTP/1.0 200 OK\n" +
-                "Connection: keep-alive\n");
+                "Connection: close\n");
 
         res.addHeader(String.format("Date: %s\n", DateUtils.getDateGMT()));
 

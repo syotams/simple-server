@@ -17,33 +17,29 @@ public class HttpProtocol implements Protocol {
     private final int PROCESSING_DATA = 2;
     private final int CLOSING = 9;
 
-    private final static String LINE_SEPARATOR = System.lineSeparator();
-
-    private int state = IDLE;
-
-    private String method, protocolVersion, resource;
-
 
     public Request process(BufferedReader bufferedReader) throws IOException {
         String clientInput;
         ArrayList<String> headers = new ArrayList<>();
         RequestBuilder requestBuilder = new RequestBuilder();
         requestBuilder.withProtocol(this);
+        Map<String, String> headersMap = null;
 
-        state = IDLE;
+        int state = IDLE;
 
         while (CLOSING!=state && null != (clientInput = bufferedReader.readLine())) {
             switch (state) {
                 case IDLE:
-                    parseProtocol(clientInput);
+                    headersMap = parseProtocol(clientInput);
                     state = PROCESSING_HEADERS;
                     break;
 
                 case PROCESSING_HEADERS:
                     if(clientInput.equals("")) {
-                        requestBuilder.withHeaders(parseHeaders(headers));
+                        headersMap.putAll(parseHeaders(headers));
+                        requestBuilder.withHeaders(headersMap);
 
-                        if(method.equals("GET")) {
+                        if(headersMap.get("METHOD").equals("GET")) {
                             state = CLOSING;
                         }
                         else {
@@ -57,27 +53,27 @@ public class HttpProtocol implements Protocol {
 
                 case PROCESSING_DATA:
                     // TODO: support for PUT, PATCH, POST etc..
-                    requestBuilder.withContent(clientInput); // process the first line and stop
+                    requestBuilder.withContent(clientInput); // handle the first line and stop
                     state = CLOSING;
                     break;
             }
-
-            System.out.println(clientInput);
         }
-
-        state = IDLE;
 
         return requestBuilder.build();
     }
 
-    private void parseProtocol(String input) {
-        Matcher matcher = Pattern.compile("^(.*?) \\/(.*?) HTTP\\/(.*)").matcher(input);
+    private Map<String, String> parseProtocol(String input) {
+        Matcher matcher = Pattern.compile("^(.*?) \\/(.*?) (HTTPS?)\\/(.*)").matcher(input);
+        Map<String, String> headers = new HashMap();
 
         if(matcher.find()) {
-            method = matcher.group(1);
-            resource = matcher.group(2).trim();
-            protocolVersion = matcher.group(3);
+            headers.put("METHOD", matcher.group(1));
+            headers.put("RESOURCE", matcher.group(2));
+            headers.put("PROTOCOL", matcher.group(3));
+            headers.put("VERSION", matcher.group(4));
         }
+
+        return headers;
     }
 
     private Map<String, String> parseHeaders(ArrayList<String> inputArr) {
@@ -94,21 +90,4 @@ public class HttpProtocol implements Protocol {
         return headers;
     }
 
-    public String getMethod() {
-        return method;
-    }
-
-    public String getProtocolVersion() {
-        return protocolVersion;
-    }
-
-    public String getResource() {
-        return resource;
-    }
-
-    // TODO: reset is redundant ?!?
-    @Override
-    public void reset() {
-        state = IDLE;
-    }
 }
